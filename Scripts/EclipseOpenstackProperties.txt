@@ -1,0 +1,15 @@
+user=root
+password=
+host=localhost
+
+MSR_ECLIPSE_SOURCE_CODE=msr_eclipse_source_code
+MSR_ECLIPSE_MAILING_LISTS=msr_eclipse_mailing_lists
+MSR_ECLIPSE_REVIEWS=msr_eclipse_reviews
+MSR_ECLIPSE_TICKETS=msr_eclipse_tickets
+
+MSR_OPENSTACK_SOURCE_CODE=msr_openstack_source_code
+MSR_OPENSTACK_MAILING_LISTS=msr_openstack_mailing_lists
+MSR_OPENSTACK_REVIEWS=msr_openstack_reviews
+MSR_OPENSTACK_TICKETS=msr_openstack_tickets
+
+
