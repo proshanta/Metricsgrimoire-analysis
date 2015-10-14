@@ -12,6 +12,11 @@
   pdf("..\\Output\\MSR_ECLIPSE_SOURCE_CODE_HIST.pdf")
   hist(MSR_ECLIPSE_SOURCE_CODE$number_of_unique_author)
   dev.off()
+  #Summary Descriptive Statistics for eclipse
+  print("Summary Descriptive Statistics for eclipse")
+  library(psych)
+  e<-describe(MSR_ECLIPSE_SOURCE_CODE$number_of_unique_author)
+  write.table(x=e,"..\\Output\\Stat_eclipse.csv",sep = ",")
   closeConnection(conn)
   
   
@@ -25,6 +30,10 @@
   pdf("..\\Output\\MSR_OPENSTACK_SOURCE_CODE_HIST.pdf")
   hist(MSR_OPENSTACK_SOURCE_CODE$number_of_unique_author)  
   dev.off()
+  #Summary Descriptive Statistics for Openstack
+  print("Summary Descriptive Statistics for openstack")
+  d<-describe(MSR_ECLIPSE_SOURCE_CODE$number_of_unique_author)
+  write.table(x=d,"..\\Output\\Stat_openstack.csv",sep = ",")
   closeConnection(conn)
   
   
