@@ -35,6 +35,40 @@
   d<-describe(MSR_ECLIPSE_SOURCE_CODE$number_of_unique_author)
   write.table(x=d,"..\\Output\\PreAnalysis\\Stat_openstack.csv",sep = ",")
   closeConnection(conn)
+
+  
+#----------------------------------------------  
+#list of each of the Eclipse repos, with the number of files in each repo that have been changed by at least two people
+  
+  #importing all supporting custom methods
+  source("Methods.R")
+  
+  #Creating MySql connection for MSR_ECLIPSE_SOURCE_CODE
+  conn<-mySqlConnection(dbName="MSR_ECLIPSE_SOURCE_CODE")
+  
+  #Finding out the repo list
+  str1<-"select id from repositories"
+  
+  rs<-executeQuery(conn,str1)
+  repoID<- fetch(rs, n = -1)
+  
+  repoFileCount<-data.frame()
+  
+  for(row in 1:nrow(repoID)){    
+    
+    str1<-paste("select count(*) from (select file_id,count(*) from (select distinct A.author_id,B.file_id from (SELECT id as commit_id,author_id,repository_id FROM `scmlog` where repository_id=",repoID[row,1],")A natural join actions B)C group by file_id having count(*)>1)D",sep='')  
+    
+    rs<-executeQuery(conn,str1)
+    noOfFiles<- fetch(rs, n = -1)
+    
+    repoFile<-data.frame(repo=repoID[row,1],filecount=noOfFiles[1][1])
+    repoFileCount<-rbind(repoFileCount,repoFile)    
+  }
+  
+  write.csv(repoFileCount, file = "../Output/PreAnalysis/RepoBasisFileCount.csv",row.names=FALSE) 
+  
+  closeConnection(conn)
+  
   
   
   
