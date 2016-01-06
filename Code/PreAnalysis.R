@@ -69,6 +69,54 @@
   
   closeConnection(conn)
   
+
+#Finding out the intersection of people among different DB (Eclipse)
+  
+  
+  #importing all supporting custom methods
+  source("Methods.R")
+  
+  #Creating MySql connection for MSR_ECLIPSE_SOURCE_CODE
+  conn<-mySqlConnection(dbName="MSR_ECLIPSE_SOURCE_CODE")
+  
+  #finding out the project list we are interested in
+  rs<-executeQuery(conn,"select project_id from(select * from (select * from (SELECT * FROM `project_repositories`)A natural join (select project_id from (SELECT * FROM `project_repositories` group by project_id,data_source having count(*)=1)A group by project_id having count(*)=4)B)C group by C.data_source,C.repository_name having count(*)=1)D group by project_id having count(*)=4")
+  
+  projectList<- fetch(rs, n = -1)
+  
+  
+  ProjectWithAuthor<-data.frame()
+  
+  for(row in 1:nrow(projectList)){    
+    
+    str1<-paste("SELECT distinct upeople_id FROM msr_eclipse_source_code.`people_upeople` where people_id in(SELECT distinct author_id FROM msr_eclipse_source_code.`scmlog` where repository_id=(SELECT id FROM msr_eclipse_source_code.`repositories` where uri=(select repository_name from msr_eclipse_source_code.project_repositories where project_id=",projectList[row,1]," and data_source='scm')))",sep='')  
+    str2<-paste("SELECT distinct upeople_id FROM msr_eclipse_tickets.`people_upeople` natural join (SELECT distinct submitted_by as people_id  FROM msr_eclipse_tickets.`comments` where issue_id in(SELECT distinct issue FROM msr_eclipse_tickets.`issues` where tracker_id=(SELECT id FROM msr_eclipse_tickets.`trackers` where url=(select repository_name from msr_eclipse_source_code.project_repositories where project_id=",projectList[row,1]," and data_source='its'))))A",sep='')
+    str3<-paste("SELECT distinct upeople_id FROM msr_eclipse_reviews.`people_upeople` natural join (SELECT distinct submitted_by as people_id  FROM msr_eclipse_reviews.`comments` where issue_id in(SELECT distinct submitted_by as people_id  FROM msr_eclipse_reviews.`comments` where issue_id in(SELECT distinct issue FROM msr_eclipse_reviews.`issues` where tracker_id=(SELECT id FROM msr_eclipse_reviews.`trackers` where url=(select repository_name from msr_eclipse_source_code.project_repositories where project_id=",projectList[row,1]," and data_source='scr')))))A",sep='')    
+    str4<-paste("SELECT distinct upeople_id FROM msr_eclipse_mailing_lists.`people_upeople` natural join (SELECT distinct email_address as people_id FROM msr_eclipse_mailing_lists.`messages_people` where mailing_list_url=(select repository_name from msr_eclipse_source_code.project_repositories where project_id=",projectList[row,1]," and data_source='mls'))A",sep='')
+    
+    
+    rs<-executeQuery(conn,str1)
+    scmAuthor<- fetch(rs, n = -1)
+    
+    rs<-executeQuery(conn,str2)
+    itsAuthor<- fetch(rs, n = -1)
+    
+    rs<-executeQuery(conn,str3)
+    scrAuthor<- fetch(rs, n = -1)
+    
+    rs<-executeQuery(conn,str4)
+    mlsAuthor<- fetch(rs, n = -1)   
+    
+    result<-merge(merge(scmAuthor,merge(itsAuthor,scrAuthor)),mlsAuthor)
+    
+    
+    projectFile<-data.frame(project=projectList[row,1],author=nrow(result))
+    ProjectWithAuthor<-rbind(ProjectWithAuthor,projectFile)    
+  }
+  
+  write.csv(ProjectWithAuthor, file = "../Output/PreAnalysis/EclipseProjectWithAuthor.csv",row.names=FALSE) 
+  
+  closeConnection(conn)
   
   
   
