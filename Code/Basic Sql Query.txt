@@ -1,0 +1,44 @@
+Project and issue distribution:
+
+Eclipse:
+
+	
+	With number of Issues
+	
+	select D.tracker_id, count(*) from (select A.issue_id as id from (select distinct issue_id from changes where old_value='new')A natural join (select distinct issue_id from changes where new_value='resolved')B)C natural join issues D group by tracker_id
+	
+	With unique owner
+	
+	select D.tracker_id, count(*),count(distinct assigned_to) from (select A.issue_id as id from (select distinct issue_id from changes where old_value='new')A natural join (select distinct issue_id from changes where new_value='resolved')B)C natural join issues D group by tracker_id
+	
+	With number of unique commenter
+	
+	select tracker_id,count(distinct submitted_by) as commenters from(select issue_id as id ,submitted_by from (select A.issue_id  from (select distinct issue_id from changes where old_value='new')A natural join (select distinct issue_id from changes where new_value='resolved')B)C natural join comments D)E natural join issues F group by tracker_id 
+	
+	
+	with number of watchers
+	
+	select H.tracker_id, G.watchers from (select D.tracker_id from (select A.issue_id as id from (select distinct issue_id from changes where old_value='new')A natural join (select distinct issue_id from changes where new_value='resolved')B)C natural join issues D group by tracker_id)H left join (select tracker_id,count(distinct person_id) as watchers from (select issue_id as id, person_id from (select A.issue_id from (select distinct issue_id from changes where old_value='new')A natural join (select distinct issue_id from changes where new_value='resolved')B)C natural join issues_watchers D)E natural join issues F group by tracker_id)G on H.tracker_id=G.tracker_id
+
+
+
+Openstack:
+
+	select D.tracker_id, count(*) from (select A.issue_id as id from (select distinct issue_id from changes where old_value='new')A natural join (select distinct issue_id from changes where new_value='Fix Committed')B)C natural join issues D group by tracker_id
+	
+	
+R query 
+
+	a<-read.csv("C:\\Users\\IBM_ADMIN\\Desktop\\issuesOwnerCommenterWatcher.csv")
+hist(a$Number.of.issues.having.resolution.time)
+hist(a$Number.of.unique.owner)
+hist(a$Number.of.unique.commenter)
+hist(a$Number.of.unique.watchers)
+
+pairs(~Number.of.issues.having.resolution.time+Number.of.unique.owner+Number.of.unique.commenter+Number.of.unique.watchers,data=a,main="Scatter plot")
+
+x<-a[2:5]
+y<-a[2:5]
+cor(x,y)
+
+
