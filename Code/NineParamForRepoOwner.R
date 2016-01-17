@@ -277,74 +277,75 @@ for(scmRow in 1:nrow(scmRepoList)){
 #------------------------------------------7. How many non domain people they are interacting with.------------------------------------------------
 
 
-
-str5<-paste("select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='mls'",sep='')
-
-rs<-executeQuery(conn,str5)
-mlsRepoList<- fetch(rs, n = -1)
-
-str6<-paste("SELECT people_id FROM msr_eclipse_mailing_lists.`people_upeople` where upeople_id in(",upeople,")",sep='')
-
-rs<-executeQuery(conn,str6)
-mlsPeopleList<- fetch(rs, n = -1)
-
-mlsPeopleListstr<-paste(unique(mlsPeopleList[,1]),collapse="','")
-
-for(scrRow in 1:nrow(mlsRepoList)){
-  
-  mlsRepoName<-mlsRepoList[scrRow,1]
-  
-  str7<-paste("select distinct D.p1,C.upeople_id as p2 from msr_eclipse_mailing_lists.people_upeople C natural join (select A.upeople_id as p1,B.p2 as people_id from msr_eclipse_mailing_lists.people_upeople A natural join (select p1 as people_id,p2 from (SELECT email_address as p1,type_of_recipient as t1,message_id FROM msr_eclipse_mailing_lists.`messages_people` where mailing_list_url='",mlsRepoName,"' and email_address in('",mlsPeopleListstr,"'))A natural join (SELECT email_address as p2,type_of_recipient as t2,message_id FROM msr_eclipse_mailing_lists.`messages_people` where mailing_list_url='",mlsRepoName,"' and email_address in('",mlsPeopleListstr,"'))B where (A.t1='To' and B.t2='From') or (A.t1='From' and B.t2='To'))B)D",sep='')
-  
-  
-  rs<-executeQuery(conn,str7)
-  upeopleWithupeople<- fetch(rs, n = -1)
-  
-  
-  newSet<-data.frame()
-  
-  for(newsetRow in 1:nrow(upeopleWithupeople)){
-    first<-upeopleWithupeople[newsetRow,1]
-    second<-upeopleWithupeople[newsetRow,2]
-    
-    str8<-paste("SELECT domain_id FROM `upeople_domains` where upeople_id=",first,sep='')
-    rs<-executeQuery(conn,str8)
-    firstset<- fetch(rs, n = -1)
-    
-    
-    str9<-paste("SELECT domain_id FROM `upeople_domains` where upeople_id=",second,sep='')
-    rs<-executeQuery(conn,str9)
-    secondset<- fetch(rs, n = -1)
-    
-    output1<-merge(firstset,secondset,by.x='domain_id',by.y='domain_id')[, c(2)]
-    
-    if(nrow(output1)==0){
-      newSet<-rbind(newSet,c(first,second))
-    }
-    
-  }
-  
-  colnames(newSet)<-c("p1","p2")
-  
-  tempstr<-paste("select p1 as upeople_id,count(*) as ",scrRow,"msldiffdomain from newSet group by p2",sep='')  
-  upeopleWithCnt<- sqldf(tempstr)
-  
-  t<-upeopleWithCnt
-  tempstr<-paste("select upeople_id,sum(",scrRow,"msldiffdomain) as ",scrRow,"msldiffdomain  from t group by upeople_id",sep='')
-  t1<-sqldf(tempstr)
-  t2<-upeopleList
-  tempstr1<-paste("select t2.upeople_id,t1.",scrRow,"msldiffdomain  from t2  left outer join t1  on t2.upeople_id=t1.upeople_id ",sep='')
-  upeopleWithCnt<-sqldf(tempstr1)
-  upeopleWithCnt[is.na(upeopleWithCnt)] <- 0
-  upeopleWithCnt<-upeopleWithCnt[with(upeopleWithCnt, order(upeople_id)), ]
-  
-  repoWiseFrame<-cbind(repoWiseFrame,upeopleWithCnt[2])      
-  
-  
-}   
-
-repoWiseFrame[is.na(repoWiseFrame)] <- 0
-
+# 
+# str5<-paste("select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='mls'",sep='')
+# 
+# rs<-executeQuery(conn,str5)
+# mlsRepoList<- fetch(rs, n = -1)
+# 
+# str6<-paste("SELECT people_id FROM msr_eclipse_mailing_lists.`people_upeople` where upeople_id in(",upeople,")",sep='')
+# 
+# rs<-executeQuery(conn,str6)
+# mlsPeopleList<- fetch(rs, n = -1)
+# 
+# mlsPeopleListstr<-paste(unique(mlsPeopleList[,1]),collapse="','")
+# 
+# for(scrRow in 1:nrow(mlsRepoList)){
+#   
+#   mlsRepoName<-mlsRepoList[scrRow,1]
+#   
+#   str7<-paste("select distinct D.p1,C.upeople_id as p2 from msr_eclipse_mailing_lists.people_upeople C natural join (select A.upeople_id as p1,B.p2 as people_id from msr_eclipse_mailing_lists.people_upeople A natural join (select p1 as people_id,p2 from (SELECT email_address as p1,type_of_recipient as t1,message_id FROM msr_eclipse_mailing_lists.`messages_people` where mailing_list_url='",mlsRepoName,"' and email_address in('",mlsPeopleListstr,"'))A natural join (SELECT email_address as p2,type_of_recipient as t2,message_id FROM msr_eclipse_mailing_lists.`messages_people` where mailing_list_url='",mlsRepoName,"' and email_address in('",mlsPeopleListstr,"'))B where (A.t1='To' and B.t2='From') or (A.t1='From' and B.t2='To'))B)D",sep='')
+#   
+#   
+#   rs<-executeQuery(conn,str7)
+#   upeopleWithupeople<- fetch(rs, n = -1)
+#   
+#   
+#   newSet<-data.frame()
+#   
+#   for(newsetRow in 1:nrow(upeopleWithupeople)){
+#     first<-upeopleWithupeople[newsetRow,1]
+#     second<-upeopleWithupeople[newsetRow,2]
+#     
+#     str8<-paste("SELECT domain_id FROM msr_eclipse_source_code.`upeople_domains` where upeople_id=",first,sep='')
+#     rs<-executeQuery(conn,str8)
+#     firstset<- fetch(rs, n = -1)
+#     
+#     
+#     str9<-paste("SELECT domain_id FROM msr_eclipse_source_code.`upeople_domains` where upeople_id=",second,sep='')
+#     rs<-executeQuery(conn,str9)
+#     secondset<- fetch(rs, n = -1)
+#     
+#     output1<-merge(firstset,secondset,by.x='domain_id',by.y='domain_id')[, c(1)]
+#     
+#     if(length(output1)==0){
+#       newSet<-rbind(newSet,c(first,second))
+#     }
+#     
+#   }
+#   
+#   colnames(newSet)<-c("p1","p2")
+#   
+#   tempstr<-paste("select p1 as upeople_id,count(*) as ",scrRow,"msldiffdomain from newSet group by p2",sep='')  
+#   upeopleWithCnt<- sqldf(tempstr)
+#   
+#   t<-upeopleWithCnt
+#   tempstr<-paste("select upeople_id,sum(",scrRow,"msldiffdomain) as ",scrRow,"msldiffdomain  from t group by upeople_id",sep='')
+#   t1<-sqldf(tempstr)
+#   t2<-upeopleList
+#   tempstr1<-paste("select t2.upeople_id,t1.",scrRow,"msldiffdomain  from t2  left outer join t1  on t2.upeople_id=t1.upeople_id ",sep='')
+#   upeopleWithCnt<-sqldf(tempstr1)
+#   upeopleWithCnt[is.na(upeopleWithCnt)] <- 0
+#   upeopleWithCnt<-upeopleWithCnt[with(upeopleWithCnt, order(upeople_id)), ]
+#   repoWiseFrame<-cbind(repoWiseFrame,upeopleWithCnt[2])
+#    
+#         
+#   
+#   
+# }   
+# 
+# repoWiseFrame[is.na(repoWiseFrame)] <- 0
+# 
 
 #-----------------------------------------9. The reviews they have been giving number of reviwes got merged.------------------------------------------->
 
@@ -380,6 +381,7 @@ for(scrRow in 1:nrow(scrRepoList)){
   upeopleWithCnt[is.na(upeopleWithCnt)] <- 0
   upeopleWithCnt<-upeopleWithCnt[with(upeopleWithCnt, order(upeople_id)), ]
   
+  colnames(upeopleWithCnt)<-c("upeople_id",paste(scrRepoName,"ReviewGotMerged",sep=''))
   
   repoWiseFrame<-cbind(repoWiseFrame,upeopleWithCnt[2])      
   
@@ -392,7 +394,7 @@ repoWiseFrame[is.na(repoWiseFrame)] <- 0
 #------------------------------------------Writing in the file------------------------------------------------
 
 filename<-paste("..\\Output\\Parameteres\\",repoName,".csv",sep='')
-write.table(x=repoWiseFrame,filename,sep = ",")
+write.table(x=repoWiseFrame,filename,sep = ",",row.names = F)
 
 }
 

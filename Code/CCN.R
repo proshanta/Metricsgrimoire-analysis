@@ -1,7 +1,7 @@
 setwd("C:/Users/IBM_ADMIN/Desktop/Subhajit Sir/Grimoire/Metricsgrimoire-analysis/Code")
 
 #read csv file where all inputs are
-mydata = read.csv("../Analysis/CCNrepoList.csv")  # read csv file
+mydata = read.csv("../Analysis/CCN/CCNrepoList.csv")  # read csv file
 
 #iterate each row/repo details in the file
 

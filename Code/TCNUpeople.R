@@ -51,20 +51,35 @@ for(row in 1:nrow(repoList)){
     
     issues<-paste(unique(authorIssueList[,1]),collapse=",")
     authors<-paste(unique(authorIssueList[,2]),collapse=",")
+        
     
+    #generating the pajek network file from vertices and edges
+    finalAuthorList<-data.frame(id=1:nrow(authorList),authorList)
+    
+    finalAuthorStr<-paste(unique(finalAuthorList[,2]),collapse=",")
+    
+    str2<-paste("SELECT people_id ,upeople_id as author_id  FROM `people_upeople` where people_id in (",finalAuthorStr,")",sep='')
+    
+    rs<-executeQuery(conn,str2)
+    peopleupeople<- fetch(rs, n = -1)
+    
+    finalAuthorList<-peopleupeople[2]
+    finalAuthorList<-data.frame(id=1:nrow(finalAuthorList),finalAuthorList)
     
     str1<-paste("select author1 as author_id1,author2 as author_id2,count(*) from (SELECT submitted_by as author1,issue_id FROM `comments` where issue_id in(",issues,") and submitted_by in (",authors,") and (DATE_FORMAT(submitted_on,'%Y-%m-%d') between '",initialDate,"' and '",endDate,"'))A natural join (SELECT submitted_by as author2,issue_id FROM `comments` where issue_id in(",issues,") and submitted_by in (",authors,") and (DATE_FORMAT(submitted_on,'%Y-%m-%d') between '",initialDate,"' and '",endDate,"'))B where author1 <> author2 group by author1,author2",sep='')
     
     rs<-executeQuery(conn,str1)
     edgeList<- fetch(rs, n = -1)
     
+    edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id1')[, c(2,3,4)]
+    edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id2')[, c(2,3,4)]
     
-    #generating the pajek network file from vertices and edges
-    finalAuthorList<-data.frame(id=1:nrow(authorList),authorList)
-    
+    colnames(edgeList)<-c("author_id1","author_id2","count")
     
     output1<-merge(finalAuthorList,edgeList,by.x='author_id',by.y='author_id1')[, c(2,3,4)]
     output2<-merge(finalAuthorList,output1,by.x='author_id',by.y='author_id2')[, c(2,3,4)]
+    
+    colnames(output2)<-c("author_id1","author_id2","count")
     
     
     fileConn<-file(paste("../Output/TCN/",repoName,".net",sep=''))
