@@ -16,6 +16,12 @@ if(nrow(issueList)==0){
   issueflag=0
 }
 
+#importing all supporting custom methods
+source("Methods.R")
+
+#Creating MySql connection for MSR_ECLIPSE_TICKETS
+conn<-mySqlConnection(dbName="MSR_ECLIPSE_TICKETS")
+
 
 #iterate each row/repo details in the file
 for(row in 1:nrow(repoList)){
@@ -25,18 +31,18 @@ for(row in 1:nrow(repoList)){
     initialDate<- repoList[row,2]
     endDate<- repoList[row,3]
     
-    #importing all supporting custom methods
-    source("Methods.R")
-    
-    #Creating MySql connection for MSR_ECLIPSE_TICKETS
-    conn<-mySqlConnection(dbName="MSR_ECLIPSE_TICKETS")
       
     
     #Finding out the author list/vertices for the network
     str1<-paste("SELECT id,assigned_to FROM `issues` where tracker_id=",repoName,sep='')
     
     rs<-executeQuery(conn,str1)
-    authorIssueList<- fetch(rs, n = -1)
+    try(authorIssueList<- fetch(rs, n = -1))
+    
+    if(nrow(authorIssueList)==0){
+        print("no author list for the repo")
+        next
+    }
     
     if(ownerflag!=0){
       authorIssueList<-merge(authorIssueList,ownerList,by.x='assigned_to',by.y='owner_id')[, c(1,2)]
@@ -61,7 +67,12 @@ for(row in 1:nrow(repoList)){
     str2<-paste("SELECT people_id ,upeople_id as author_id  FROM `people_upeople` where people_id in (",finalAuthorStr,")",sep='')
     
     rs<-executeQuery(conn,str2)
-    peopleupeople<- fetch(rs, n = -1)
+    try(peopleupeople<- fetch(rs, n = -1))
+    
+    if(nrow(peopleupeople)==0){
+        print("no people upeople mapping for the repo")
+        next
+    }
     
     finalAuthorList<-peopleupeople[2]
     finalAuthorList<-data.frame(id=1:nrow(finalAuthorList),finalAuthorList)
@@ -69,7 +80,12 @@ for(row in 1:nrow(repoList)){
     str1<-paste("select author1 as author_id1,author2 as author_id2,count(*) from (SELECT submitted_by as author1,issue_id FROM `comments` where issue_id in(",issues,") and submitted_by in (",authors,") and (DATE_FORMAT(submitted_on,'%Y-%m-%d') between '",initialDate,"' and '",endDate,"'))A natural join (SELECT submitted_by as author2,issue_id FROM `comments` where issue_id in(",issues,") and submitted_by in (",authors,") and (DATE_FORMAT(submitted_on,'%Y-%m-%d') between '",initialDate,"' and '",endDate,"'))B where author1 <> author2 group by author1,author2",sep='')
     
     rs<-executeQuery(conn,str1)
-    edgeList<- fetch(rs, n = -1)
+    try(edgeList<- fetch(rs, n = -1))
+    
+    if(nrow(edgeList)==0){
+        print("no edge list for the repo")
+        next
+    }
     
     edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id1')[, c(2,3,4)]
     edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id2')[, c(2,3,4)]

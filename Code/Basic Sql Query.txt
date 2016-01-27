@@ -43,3 +43,8 @@ y<-a[2:5]
 cor(x,y)
 
 
+---------------------------------------------------------------------------------
+#Finding out repo list
+
+select id as repo_id,mn as initial_date,mx as end_date,cnt from (select D.tracker_id as id , count(*) as cnt,DATE_FORMAT(max(submitted_on),'%Y-%m-%d') as mx,DATE_FORMAT(min(submitted_on),'%Y-%m-%d') as mn from (select A.issue_id as id from (select distinct issue_id from msr_eclipse_tickets.changes where old_value='new')A natural join (select distinct issue_id from msr_eclipse_tickets.changes where new_value='resolved')B)C natural join msr_eclipse_tickets.issues D group by tracker_id)A natural join (select id from (SELECT distinct repository_name as url FROM msr_eclipse_source_code.`project_repositories` where data_source='its')A natural join msr_eclipse_tickets.trackers B)C where cnt>=50
+	

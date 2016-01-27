@@ -1,13 +1,13 @@
 setwd("C:/Users/IBM_ADMIN/Desktop/Subhajit Sir/Grimoire/Metricsgrimoire-analysis/Code")
 
 #read csv file where all repo list are
-repoList = read.csv("../Analysis/TCN/TCNrepoList.csv")  # read csv file
+repoList = read.csv("../Analysis/CCN/CCNrepoList.csv")  # read csv file
 
 #read csv file where all owner list are
-ownerList = read.csv("../Analysis/TCN/TCNownerList.csv")  # read csv file
+ownerList = read.csv("../Analysis/CCN/CCNownerList.csv")  # read csv file
 
 #read csv file where all issue list are
-issueList = read.csv("../Analysis/TCN/TCNissueList.csv")  # read csv file
+issueList = read.csv("../Analysis/CCN/CCNissueList.csv")  # read csv file
 
 if(nrow(ownerList)==0){
   ownerflag=0
@@ -15,6 +15,12 @@ if(nrow(ownerList)==0){
 if(nrow(issueList)==0){
   issueflag=0
 }
+
+#importing all supporting custom methods
+source("Methods.R")
+
+#Creating MySql connection for MSR_ECLIPSE_TICKETS
+conn<-mySqlConnection(dbName="MSR_ECLIPSE_TICKETS")
 
 
 #iterate each row/repo details in the file
@@ -24,19 +30,21 @@ for(row in 1:nrow(repoList)){
     repoName <- repoList[row,1]
     initialDate<- repoList[row,2]
     endDate<- repoList[row,3]
-    
-    #importing all supporting custom methods
-    source("Methods.R")
-    
-    #Creating MySql connection for MSR_ECLIPSE_TICKETS
-    conn<-mySqlConnection(dbName="MSR_ECLIPSE_TICKETS")
+
       
     
     #Finding out the author list/vertices for the network
     str1<-paste("SELECT id,assigned_to FROM `issues` where tracker_id=",repoName,sep='')
     
     rs<-executeQuery(conn,str1)
-    authorIssueList<- fetch(rs, n = -1)
+    try(authorIssueList<- fetch(rs, n = -1))
+    
+    #Exception caught
+    if(nrow(authorIssueList)==0){
+        print("No author for the repo")
+        next
+    }
+    
     
     if(ownerflag!=0){
       authorIssueList<-merge(authorIssueList,ownerList,by.x='assigned_to',by.y='owner_id')[, c(1,2)]
@@ -61,7 +69,12 @@ for(row in 1:nrow(repoList)){
     str2<-paste("SELECT people_id ,upeople_id as author_id  FROM `people_upeople` where people_id in (",finalAuthorStr,")",sep='')
     
     rs<-executeQuery(conn,str2)
-    upeopleList<- fetch(rs, n = -1)    
+    try(upeopleList<- fetch(rs, n = -1))
+    
+    if(nrow(upeopleList)==0){
+        print("No upeople mapping")
+        next
+    }    
     
     upeople<-paste(unique(upeopleList[,2]),collapse=",")
     
@@ -75,12 +88,23 @@ for(row in 1:nrow(repoList)){
     str2<-paste("select id from msr_eclipse_source_code.repositories where uri in (select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='scm')",sep='')
     
     rs<-executeQuery(conn,str2)
-    scmRepoList<- fetch(rs, n = -1)
+    try(scmRepoList<- fetch(rs, n = -1))
+    
+    if(nrow(scmRepoList)==0){
+        print("No scm repo list")
+        next
+    } 
     
     str3<-paste("SELECT people_id,upeople_id FROM msr_eclipse_source_code.`people_upeople` where upeople_id in(",upeople,")",sep='')
     
     rs<-executeQuery(conn,str3)
-    peopleupeople<- fetch(rs, n = -1)
+    try(peopleupeople<- fetch(rs, n = -1))
+    
+    if(nrow(peopleupeople)==0){
+        print("No people upeople mapping")
+        next
+    } 
+    
     
     scmPeopleList<-peopleupeople[1]
     scmPeopleListstr<-paste(unique(scmPeopleList[,1]),collapse=",")
@@ -92,7 +116,12 @@ for(row in 1:nrow(repoList)){
       str4<-paste("select author_id1,author_id2,count(*) as cnt from (select author_id as author_id1,file_id from msr_eclipse_source_code.actions A natural join (SELECT id as commit_id,author_id FROM msr_eclipse_source_code.`scmlog` where repository_id=",scmRepoName," and author_id in(",scmPeopleListstr,"))B)C natural join (select author_id as author_id2,file_id from msr_eclipse_source_code.actions A natural join (SELECT id as commit_id,author_id FROM msr_eclipse_source_code.`scmlog` where repository_id=",scmRepoName," and author_id in(",scmPeopleListstr,"))B)D where author_id1<>author_id2 group by author_id1,author_id2",sep='')
       
       rs<-executeQuery(conn,str4)
-      edgeList<- fetch(rs, n = -1)
+      try(edgeList<- fetch(rs, n = -1))
+      
+      if(nrow(edgeList)==0){
+          print("No edge list for the repo")
+          next
+      } 
       
       edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id1')[, c(2,3,4)]
       edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id2')[, c(2,3,4)]
