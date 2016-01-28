@@ -31,7 +31,8 @@ for(row in 1:nrow(repoList)){
     initialDate<- repoList[row,2]
     endDate<- repoList[row,3]
 
-      
+    print("working with")
+    print(repoName)
     
     #Finding out the author list/vertices for the network
     str1<-paste("SELECT id,assigned_to FROM `issues` where tracker_id=",repoName,sep='')
@@ -42,6 +43,7 @@ for(row in 1:nrow(repoList)){
     #Exception caught
     if(nrow(authorIssueList)==0){
         print("No author for the repo")
+        print(repoName)
         next
     }
     
@@ -73,6 +75,7 @@ for(row in 1:nrow(repoList)){
     
     if(nrow(upeopleList)==0){
         print("No upeople mapping")
+        print(repoName)
         next
     }    
     
@@ -92,6 +95,7 @@ for(row in 1:nrow(repoList)){
     
     if(nrow(scmRepoList)==0){
         print("No scm repo list")
+        print(repoName)
         next
     } 
     
@@ -120,6 +124,7 @@ for(row in 1:nrow(repoList)){
       
       if(nrow(edgeList)==0){
           print("No edge list for the repo")
+          print(repoName)
           next
       } 
       
