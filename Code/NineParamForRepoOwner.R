@@ -87,6 +87,7 @@ library(sqldf)
         
         if(nrow(authorIssueList)==0){
             print("no author list for the repo")
+            print(repoName)
             next
         }
         
@@ -114,7 +115,8 @@ library(sqldf)
         try(upeopleList<- fetch(rs, n = -1))
         
         if(nrow(upeopleList)==0){
-            print("no upeople list for the repo")
+            print("no upeople list for the repo:")
+            print(repoName)
             next
         }
         
@@ -135,12 +137,8 @@ library(sqldf)
         str<-paste("select id from msr_eclipse_source_code.repositories where uri in (select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='scm')",sep='')
   
         rs<-executeQuery(conn,str)
-        try(scmRepoList<- fetch(rs, n = -1))
+        scmRepoList<- fetch(rs, n = -1)
         
-        if(nrow(scmRepoList)==0){
-            print("no scm repo for the repo")
-            next
-        }
 
         if(nrow(scmRepoList)!=0){
   
@@ -170,6 +168,7 @@ library(sqldf)
             
             if(nrow(scmAuthorCnt)==0){
                 print("no scm author count for the repo")
+                print(repoName)
                 next
             }
             
@@ -221,13 +220,9 @@ library(sqldf)
         str<-paste("select id from msr_eclipse_reviews.trackers where url in (select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='scr')",sep='')
   
         rs<-executeQuery(conn,str)
-        try(scrRepoList<- fetch(rs, n = -1))
+        scrRepoList<- fetch(rs, n = -1)
 
-        if(nrow(scrRepoList)==0){
-            print("no scr repo list for the repo")
-            next
-        }
-
+ 
         
         if(nrow(scrRepoList)!=0){
   
@@ -239,6 +234,7 @@ library(sqldf)
         
         if(nrow(scrPeopleList)==0){
             print("no people for the SCR repo")
+            print(repoName)
             next
             
         }
@@ -257,6 +253,7 @@ library(sqldf)
             
             if(nrow(upeopleWithCnt)==0){
                 print("no people upeople mapping  for the scr repo")
+                print(repoName)
                 next
             }
             
@@ -287,14 +284,9 @@ library(sqldf)
         str<-paste("select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='mls'",sep='')
   
         rs<-executeQuery(conn,str)
-        try(mlsRepoList<- fetch(rs, n = -1))
+        mlsRepoList<- fetch(rs, n = -1)
 
-        if(nrow(mlsRepoList)==0){
-            print("no mls repo for the repo")
-            next
-        }
-
-    
+ 
         if(nrow(mlsRepoList)!=0){
         
         #list of mailer
@@ -305,6 +297,7 @@ library(sqldf)
         
         if(nrow(mlsPeopleList)==0){
             print("no people upeople mapping  for the mls repo")
+            print(repoName)
             next
         }
         
@@ -324,6 +317,7 @@ library(sqldf)
             
             if(nrow(upeopleWithCnt)==0){
                 print("no upeople with count for the mls repo")
+                print(repoName)
                 next
             }
             
@@ -350,12 +344,7 @@ library(sqldf)
         str<-paste("SELECT upeople_id,count(*) as number_of_domain FROM msr_eclipse_source_code.`upeople_domains` where upeople_id in(",upeople,") group by upeople_id",sep='')
   
         rs<-executeQuery(conn,str)
-        try(upeopleWithCnt<- fetch(rs, n = -1))
-
-        if(nrow(upeopleWithCnt)==0){
-            print("no upeople with count for the scr repo")
-            next
-        }
+        upeopleWithCnt<- fetch(rs, n = -1)
 
 
         t1<-upeopleWithCnt
@@ -378,13 +367,9 @@ library(sqldf)
         str<-paste("SELECT upeople_id,country_id as country FROM msr_eclipse_source_code.`upeople_countries` where upeople_id in(",upeople,") ",sep='')
   
         rs<-executeQuery(conn,str)
-        try(upeopleWithCnt<- fetch(rs, n = -1))
+        upeopleWithCnt<- fetch(rs, n = -1)
 
-        if(nrow(upeopleWithCnt)==0){
-            print("no upeople with country for the scr repo")
-            next
-        }
-
+ 
   
         t1<-upeopleWithCnt
         t2<-upeopleList
@@ -406,14 +391,7 @@ library(sqldf)
         str<-paste("select id from msr_eclipse_source_code.repositories where uri in (select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='scm')",sep='')
   
         rs<-executeQuery(conn,str)
-        try(scmRepoList<- fetch(rs, n = -1))
-
-        if(nrow(scmRepoList)==0){
-            print("no repo list for the scm repo")
-            next
-        }
-
-
+        scmRepoList<- fetch(rs, n = -1)
 
         if(nrow(scmRepoList)!=0){
         
@@ -425,6 +403,7 @@ library(sqldf)
         
         if(nrow(scmPeopleList)==0){
             print("no repo list for the scm repo")
+            print(repoName)
             next
         }
         
@@ -442,6 +421,7 @@ library(sqldf)
             
             if(nrow(scmAuthorCnt)==0){
                 print("no scm repo with count for the scm repo")
+                print(repoName)
                 next
             }
             
@@ -542,12 +522,8 @@ library(sqldf)
         str<-paste("select id from msr_eclipse_reviews.trackers where url in (select distinct repository_name from msr_eclipse_source_code.`project_repositories` where project_id in(SELECT distinct project_id FROM msr_eclipse_source_code.`project_repositories` where repository_name=(SELECT url FROM msr_eclipse_tickets.`trackers` where id=",repoName,")) and data_source='scr')",sep='')
   
         rs<-executeQuery(conn,str)
-        try(scrRepoList<- fetch(rs, n = -1))
+        scrRepoList<- fetch(rs, n = -1)
 
-        if(nrow(scrRepoList)==0){
-            print("no scr repo with count for the scr repo")
-            next
-        }
 
 
         if(nrow(scrRepoList)!=0){
@@ -560,6 +536,7 @@ library(sqldf)
         
         if(nrow(scrPeopleList)==0){
             print("no scr people upeople mapping for the scr repo")
+            print(repoName)
             next
         }
         
@@ -577,6 +554,7 @@ library(sqldf)
             
             if(nrow(upeopleWithCnt)==0){
                 print("no people with count for the scr repo")
+                print(repoName)
                 next
             }
             
