@@ -1,13 +1,13 @@
 setwd("C:/Users/IBM_ADMIN/Desktop/Subhajit Sir/Grimoire/Metricsgrimoire-analysis/Code")
 
 #read csv file where all repo list are
-repoList = read.csv("../Analysis/MCN/MCNrepoList.csv")  # read csv file
+repoList = read.csv("../Analysis/MLN/MCNrepoList.csv")  # read csv file
 
 #read csv file where all owner list are
-ownerList = read.csv("../Analysis/MCN/MCNownerList.csv")  # read csv file
+ownerList = read.csv("../Analysis/MLN/MCNownerList.csv")  # read csv file
 
 #read csv file where all issue list are
-issueList = read.csv("../Analysis/MCN/MCNissueList.csv")  # read csv file
+issueList = read.csv("../Analysis/MLN/MCNissueList.csv")  # read csv file
 
 if(nrow(ownerList)==0){
   ownerflag=0
@@ -148,7 +148,7 @@ for(row in 1:nrow(repoList)){
         vertices<-c(vertices,str3)      
       }
       
-      vertices<-c(vertices,"*Edges")
+      vertices<-c(vertices,"*Arcs")
       
       for(lines in 1:nrow(edgeList)){
         str3<-paste(edgeList[lines,1],' ',edgeList[lines,2],' ',edgeList[lines,3],sep='')
