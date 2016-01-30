@@ -1,4 +1,4 @@
-*Vertices  8
+*Vertices  7
 1 "300" box
 2 "2235" box
 3 "378982" box
@@ -6,7 +6,6 @@
 5 "387312" box
 6 "387318" box
 7 "498" box
-8 "387312" box
 *Arcs
 1 4 3
 1 2 6

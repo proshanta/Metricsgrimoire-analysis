@@ -1,0 +1,5 @@
+"upeople_id","X444scmChanges","X448scmChanges","number_of_domain","country","X444linesadded","X444linesremoved","X448linesadded","X448linesremoved","X","in_degree","out_degree","degree","betweenness","clustcoeff","closeness","eigencentrality"
+4,95,25,4,7,27119,17118,16028,166,1,2,2,2,0,0,0.00917431192660551,1
+7,100,0,3,9,72519,22964,0,0,2,2,2,2,0,0,0.00917431192660551,0.999995093769532
+8,5,0,2,10,115,61,0,0,4,0,0,0,0,0,0.25,0.49999967587608
+378243,0,0,13,0,0,0,0,0,3,0,0,0,0,0,0.25,0.49999967587608

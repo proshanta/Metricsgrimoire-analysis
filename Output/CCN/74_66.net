@@ -1,11 +1,8 @@
-*Vertices  7
+*Vertices  4
 1 "527" box
 2 "378243" box
 3 "683" box
 4 "679" box
-5 "378243" box
-6 "378243" box
-7 "378243" box
 *Edges
 1 3 134
 1 4 5

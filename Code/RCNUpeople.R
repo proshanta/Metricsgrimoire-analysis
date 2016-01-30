@@ -80,8 +80,8 @@ for(row in 1:nrow(repoList)){
     upeople<-paste(unique(upeopleList[,2]),collapse=",")
     
     
-    finalAuthorList<-data.frame(id=1:nrow(upeopleList),upeopleList)
-    finalAuthorList<-finalAuthorList[c(1,3)]
+    finalAuthorList<-data.frame(id=1:nrow(unique(upeopleList[2])),unique(upeopleList[2]))
+    #finalAuthorList<-finalAuthorList[c(1,3)]
     
     
     #-----------------------finding the edge list-----------------------------
