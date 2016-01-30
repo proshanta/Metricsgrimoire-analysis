@@ -108,8 +108,8 @@ for(row in 1:nrow(repoList)){
     
     vertices<-c(vertices,"*Edges")
     
-    for(lines in 1:nrow(edgeList)){
-      str3<-paste(edgeList[lines,1],' ',edgeList[lines,2],' ',edgeList[lines,3],sep='')
+    for(lines in 1:nrow(output2)){
+      str3<-paste(output2[lines,1],' ',output2[lines,2],' ',output2[lines,3],sep='')
       vertices<-c(vertices,str3)      
     }
     

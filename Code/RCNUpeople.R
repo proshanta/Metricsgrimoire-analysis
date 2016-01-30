@@ -81,6 +81,7 @@ for(row in 1:nrow(repoList)){
     
     
     finalAuthorList<-data.frame(id=1:nrow(upeopleList),upeopleList)
+    finalAuthorList<-finalAuthorList[c(1,3)]
     
     
     #-----------------------finding the edge list-----------------------------
@@ -124,13 +125,20 @@ for(row in 1:nrow(repoList)){
       
       if(nrow(edgeList)==0){
           print("No edge list for the scr repo")
-          next
+          print(scmRow)
+          next          
       }
-      
       
       
       edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id1')[, c(2,3,4)]
       edgeList<-merge(peopleupeople,edgeList,by.x='people_id',by.y='author_id2')[, c(2,3,4)]
+      
+      if(nrow(edgeList)==0){
+          print("No edge list for the scr repo")
+          print(scmRow)
+          next          
+      }
+      
       
       colnames(edgeList)<-c("author_id1","author_id2","count")
       
@@ -153,8 +161,8 @@ for(row in 1:nrow(repoList)){
       
       vertices<-c(vertices,"*Edges")
       
-      for(lines in 1:nrow(edgeList)){
-        str3<-paste(edgeList[lines,1],' ',edgeList[lines,2],' ',edgeList[lines,3],sep='')
+      for(lines in 1:nrow(output2)){
+        str3<-paste(output2[lines,1],' ',output2[lines,2],' ',output2[lines,3],sep='')
         vertices<-c(vertices,str3)      
       }
       
