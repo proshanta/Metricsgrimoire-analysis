@@ -1,0 +1,6 @@
+"upeople_id","no_of_bug_owned","avg_resolution","X331scmChanges","X375scrChanges","number_of_domain","country","X331linesadded","X331linesremoved","X375ReviewGotMerged","X","in_degree","out_degree","degree","betweenness","clustcoeff","closeness","eigencentrality"
+2879,1,0,94,0,2,7,91055,56693,0,4,4,4,4,0,0,0.2,1
+2881,2,0,2,0,3,6,6531,17,0,3,0,0,0,0,0,0.2,0.0811388300841897
+2887,2,0.5,32,9,2,6,12499,8035,6,1,0,0,0,0,0,0.2,0.0811388300841897
+378243,271,0.0728,0,0,13,0,0,0,0,2,0,0,0,0,0,0.2,0.0811388300841897
+398693,0,0,0,0,2,0,0,0,0,5,0,0,0,0,0,0.2,0.0811388300841897
