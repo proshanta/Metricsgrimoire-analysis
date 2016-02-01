@@ -82,6 +82,7 @@ for(row in 1:length(filenames)){
     
     repoWiseNoOfBug<-mean(repoWiseFrame[,2])
     repoWiseAvgReso<-mean(repoWiseFrameResolutionTime[,2])
+    repoWiseNoOfBugSum<-sum(repoWiseFrame[,2])
     
     
     
@@ -91,7 +92,7 @@ for(row in 1:length(filenames)){
     
     write.csv(upeopleWithNOBandARTMain,file1,row.names= FALSE)    
     
-    repoFamily<-rbind(repoFamily,data.frame(repoName=repoName,repoWiseNoOfBug=repoWiseNoOfBug,repoWiseAvgReso=repoWiseAvgReso))
+    repoFamily<-rbind(repoFamily,data.frame(repoName=repoName,repoWiseNoOfBug=repoWiseNoOfBug,repoWiseAvgReso=repoWiseAvgReso,repoWiseNoOfBugSum=repoWiseNoOfBugSum))
     
             
 }
@@ -109,7 +110,7 @@ repoNameWithSubRepo<-rbind(repoNameWithSubRepo,a)
 }
 
 colnames(repoNameWithSubRepo)<-c("temp","repo")
-colnames(repoFamily)<-c("repo","avg_no_of_bugs_owned_by_author","avg_resolution_time")
+colnames(repoFamily)<-c("repo","avg_no_of_bugs_owned_by_author","avg_resolution_time","total_no_of_bugs_owned_by_author")
 
 repoNameWithSubRepo<-merge(repoNameWithSubRepo,repoFamily,by.x='repo',by.y='repo')
 
