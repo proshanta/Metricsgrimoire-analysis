@@ -1,0 +1,140 @@
+---
+title: "CCN_REPO_ANALYSIS_OUTPUT1_CORRELATION"
+author: "Proshanta Sarkar"
+date: "Monday, August 22, 2016"
+output: html_document
+---
+
+```{r warning=FALSE}
+setwd("C:/Users/IBM_ADMIN/Desktop/Subhajit Sir/Grimoire/Metricsgrimoire-analysis/Code")
+
+directory<-"../Output/CCN_REPO_ANALYSIS_OUTPUT1/"
+resultdirectory<-"../Output/CCN_REPO_ANALYSIS_OUTPUT1/Result/"
+resultCordirectory<-"../Output/CCN_REPO_ANALYSIS_OUTPUT1/ResultCor/"
+resultRegdirectory<-"../Output/CCN_REPO_ANALYSIS_OUTPUT1/ResultReg/"
+
+#read csv file where all repo list are
+filenames <- list.files(path=directory,pattern="*.csv")
+
+degBetPP=0
+degBetNN=0
+degBetPN=0
+degBetNP=0
+
+
+#iterate each row/repo details in the file
+for(row in 1:length(filenames)){
+    
+    
+    #repo name, and date range
+    repoName<-unlist(strsplit(toString(filenames[row]),"[.]"))[1]
+    
+    filePath<-paste(directory,filenames[row],sep='')
+    Resultfilepath<-paste(resultdirectory,filenames[row],sep='')
+    ResultCorfilepath<-paste(resultCordirectory,filenames[row],sep='')
+    ResultRegfilepath<-paste(resultRegdirectory,filenames[row],sep='')
+     
+    file <- read.csv(filePath)
+    
+    upeople_id<-file$upeople_id
+    
+    #DataFrame where we will store all parameters for each repo
+    resultFrame<-data.frame(upeople_id=upeople_id)
+    
+    no_of_bug_owned<-file$no_of_bug_owned
+    avg_resolution<-file$avg_resolution
+    
+    z<-grep('*scmChanges',names(file))
+    if(length(z)==1){
+        scmChanges<-file[z]
+        colnames(scmChanges)<-c("scmChanges")
+    }else{
+        scmChanges<-rowSums(file[, z])
+    }
+    
+    
+    z<-grep('*scrChanges',names(file))
+    if(length(z)==1){
+        scrChanges<-file[z]
+        colnames(scrChanges)<-c("scrChanges")
+    }else{
+        scrChanges<-rowSums(file[, z])
+    }
+    
+    
+    z<-grep('*mslChanges',names(file))
+    if(length(z)==1){
+        mslChanges<-file[z]
+        colnames(mslChanges)<-c("mslChanges")
+    }else{
+        mslChanges<-rowSums(file[, z])
+    }
+    
+    
+    number_of_domain<-file$number_of_domain
+    country<-file$country
+    
+    z<-grep('*linesadded',names(file))
+    if(length(z)==1){
+        linesadded<-file[z]
+        colnames(linesadded)<-c("linesadded")
+    }else{
+        linesadded<-rowSums(file[, z])
+    }
+    
+    
+    z<-grep('*linesremoved',names(file))
+    if(length(z)==1){
+        linesremoved<-file[z]
+        colnames(linesremoved)<-c("linesremoved")
+    }else{
+        linesremoved<-rowSums(file[, z])
+    }
+    
+    
+    z<-grep('*ReviewGotMerged',names(file))
+    if(length(z)==1){
+        ReviewGotMerged<-file[z]
+        colnames(ReviewGotMerged)<-c("ReviewGotMerged")
+    }else{
+        ReviewGotMerged<-rowSums(file[, z])
+    }
+    
+    
+    X<-file$X
+    in_degree<-file$in_degree
+    out_degree<-file$out_degree
+    degree<-file$degree
+    betweenness<-file$betweenness
+    clustcoeff<-file$clustcoeff
+    closeness<-file$closeness
+    eigencentrality<-file$eigencentrality
+    
+    resultFrame<-cbind(no_of_bug_owned=no_of_bug_owned,avg_resolution=avg_resolution,scmChanges=scmChanges,scrChanges=scrChanges,mslChanges=mslChanges,number_of_domain=number_of_domain,country=country,linesadded=linesadded,linesremoved=linesremoved,ReviewGotMerged=ReviewGotMerged,X=X,in_degree=in_degree,out_degree=out_degree,degree=degree,betweenness=betweenness,clustcoeff=clustcoeff,closeness=closeness,eigencentrality=eigencentrality,resultFrame)
+    
+    CorValue<-cor(resultFrame)
+    #RegValue<-cor(resultFrame)
+    
+    deg<-CorValue[2,14]
+    bet<-CorValue[2,15]
+    if(!is.na(deg) && !is.na(bet)){
+    if(deg>0 && bet>0){
+        degBetPP=degBetPP+1        
+    }else if(deg<0 && bet<0){
+        degBetNN=degBetNN+1
+    }else if(deg>0 && bet<0){
+        degBetPN=degBetPN+1
+    }else{
+        degBetNP=degBetNP+1
+    }
+    }
+    
+    write.csv(resultFrame,Resultfilepath,row.names= FALSE) 
+    write.csv(CorValue,ResultCorfilepath,row.names= TRUE)
+    #write.csv(RegValue,ResultRegfilepath,row.names= TRUE)    
+    
+} 
+
+cat("DEGREE:BETWEENESS|","P:P",degBetPP," N:N",degBetNN," P:N",degBetPN," N:P",degBetNP)
+
+```
