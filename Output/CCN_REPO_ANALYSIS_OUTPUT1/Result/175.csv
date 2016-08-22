@@ -1,0 +1,4 @@
+"no_of_bug_owned","avg_resolution","scmChanges","scrChanges","mslChanges","number_of_domain","country","linesadded","linesremoved","ReviewGotMerged","X","in_degree","out_degree","degree","betweenness","clustcoeff","closeness","eigencentrality","upeople_id"
+0,0,136,132,3,4,8,346831,176377,130,3,2,2,2,0,0,0.00625,1,545
+0,0,46,3,0,4,7,13708,10062,3,1,2,2,2,0,0,0.00625,0.999997348758272,546
+0,0,0,0,0,13,0,0,0,0,2,0,0,0,0,0,0.333333333333333,0.49999883606099,378243
