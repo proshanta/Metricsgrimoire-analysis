@@ -1,0 +1,55 @@
+---
+title: "CCN_REPO_ANALYSIS_OUTPUT1_CORRELATION"
+author: "Proshanta Sarkar"
+date: "Monday, August 22, 2016"
+output: html_document
+---
+
+```{r }
+setwd("C:/Users/IBM_ADMIN/Desktop/Subhajit Sir/Grimoire/Metricsgrimoire-analysis/Code")
+
+directory<-"../Output/CCN_REPO_ANALYSIS_OUTPUT1/Result/"
+resultdirectory<-"../Output/CCN_NW_METRICS/FAMILY_METRICS/lastAddedCCNNetwork_Family-metrics.csv"
+
+
+#read csv file where all repo list are
+filenames <- list.files(path=directory,pattern="*.csv")
+
+resultFrame<-data.frame()
+
+#iterate each row/repo details in the file
+for(row in 1:length(filenames)){
+    
+    
+    #repo name, and date range
+    repoName<-as.numeric(unlist(strsplit(toString(filenames[row]),"[.]"))[1])
+    
+    filePath<-paste(directory,filenames[row],sep='')
+     
+    file <- read.csv(filePath)
+    
+    numberOfDev<-nrow(file)
+    
+    Total_number_of_commits<-round(sum(file[,"scmChanges"]))
+    Average_number_of_commits<-round(Total_number_of_commits/numberOfDev)
+    Total_number_of_reviews<-round(sum(file[,"scrChanges"]))
+    Average_number_of_reviews<-round(Total_number_of_reviews/numberOfDev)
+    Total_number_of_emails<-round(sum(file[,"mslChanges"]))
+    Average_number_of_emails<-round(Total_number_of_emails/numberOfDev)
+    Total_lines_of_code<-round(sum(file[,"linesadded"])+sum(file[,"linesremoved"]))
+    Average_number_lines_of_code<-round(Total_lines_of_code/numberOfDev)
+    Total_number_of_reviews_got_merged<-round(sum(file[,"ReviewGotMerged"]))
+    Average_number_of_reviews_got_merged<-round(Total_number_of_reviews_got_merged/numberOfDev)
+    
+    newRow<- c(repoName,Total_number_of_commits,Average_number_of_commits,Total_number_of_reviews,Average_number_of_reviews,Total_number_of_emails,Average_number_of_emails,Total_lines_of_code,Average_number_lines_of_code,Total_number_of_reviews_got_merged,Average_number_of_reviews_got_merged)
+    
+     
+    resultFrame<-rbind(newRow,resultFrame)
+    
+} 
+
+colnames(resultFrame)<- c("repoName","Total_number_of_commits","Average_number_of_commits","Total_number_of_reviews","Average_number_of_reviews","Total_number_of_emails","Average_number_of_emails","Total_lines_of_code","Average_number_lines_of_code","Total_number_of_reviews_got_merged","Average_number_of_reviews_got_merged")
+
+write.csv(resultFrame,resultdirectory,row.names= FALSE) 
+
+```
