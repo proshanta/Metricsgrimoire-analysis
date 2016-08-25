@@ -1,0 +1,5 @@
+"upeople_id","no_of_review_by_the_author_got_merged","AVG_Merge_Time","X66scmChanges","X287scrChanges","X1mslChanges","number_of_domain","country","X66linesadded","X66linesremoved","X287ReviewGotMerged","X","in_degree","out_degree","degree","betweenness","clustcoeff","closeness","eigencentrality"
+527,7,0,52,9,195,4,10,3838,884,7,1,0,0,0,0,0,0.25,0.499999556967791
+679,133,0,364,171,95,4,6,253423,76128,133,4,2,2,2,0,0,0.3,0.999999338886737
+683,132,0,146,191,30,3,8,128355,46819,132,3,2,2,2,0,0,0.3,1
+378243,0,0,0,0,0,13,0,0,0,0,2,0,0,0,0,0,0.25,0.499999556967791
