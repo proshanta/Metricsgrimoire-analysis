@@ -1,0 +1,6 @@
+*Vertices  2
+1 "21" box
+2 "22" box
+*Edges
+1 2 78
+2 1 78

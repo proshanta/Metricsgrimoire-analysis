@@ -1,0 +1,8 @@
+*Vertices  4
+1 "411" box
+2 "670" box
+3 "412" box
+4 "589" box
+*Edges
+4 2 5
+2 4 5

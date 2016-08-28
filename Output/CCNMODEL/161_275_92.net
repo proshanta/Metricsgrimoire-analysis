@@ -1,0 +1,6 @@
+*Vertices  2
+1 "2281" box
+2 "2282" box
+*Edges
+1 2 42
+2 1 42
