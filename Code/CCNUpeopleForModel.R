@@ -142,6 +142,7 @@ for(row in 1:nrow(repoList)){
 	
 	
     colnames(scmRepoListWithMxMnDd)<- c("repo","mx","mn","md")
+    scmRepoListWithMxMnDd<-na.omit(scmRepoListWithMxMnDd)
 	
    
     for(scmRow in 1:nrow(scmRepoListWithMxMnDd)){
@@ -151,8 +152,12 @@ for(row in 1:nrow(repoList)){
       mn<-scmRepoListWithMxMnDd[scmRow,3]
       md<-scmRepoListWithMxMnDd[scmRow,4]
       
-      ###loop not closed yet
+      
       for(monthRow in 0:(md-1)){
+          
+              if(monthRow<0){
+                  next
+              }    
           
               str9<-paste("SELECT author_id FROM msr_eclipse_source_code.`scmlog` where repository_id=",scmRepoName," and author_id in(",scmPeopleListstr,") and DATE_FORMAT(author_date,'%Y-%m-%d')<=DATE_SUB(LAST_DAY('",mx,"'), INTERVAL ",monthRow," MONTH)",sep='')
               
