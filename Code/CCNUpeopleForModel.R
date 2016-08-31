@@ -114,7 +114,7 @@ for(row in 1:nrow(repoList)){
         next
     } 
         
-    scmPeopleList<-peopleupeople[1]
+    scmPeopleList<-unique(peopleupeople[1])
     scmPeopleListstr<-paste(unique(scmPeopleList[,1]),collapse=",")
 	
 	
@@ -152,12 +152,14 @@ for(row in 1:nrow(repoList)){
       mn<-scmRepoListWithMxMnDd[scmRow,3]
       md<-scmRepoListWithMxMnDd[scmRow,4]
       
+ 
       
       for(monthRow in 0:(md-1)){
           
               if(monthRow<0){
                   next
-              }    
+              }  
+              
           
               str9<-paste("SELECT author_id FROM msr_eclipse_source_code.`scmlog` where repository_id=",scmRepoName," and author_id in(",scmPeopleListstr,") and DATE_FORMAT(author_date,'%Y-%m-%d')<=DATE_SUB(LAST_DAY('",mx,"'), INTERVAL ",monthRow," MONTH)",sep='')
               
